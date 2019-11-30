@@ -2,12 +2,6 @@ package com.example.morse_lock;
 
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import android.view.View;
-
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -46,6 +40,23 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        /*navigationView.setNavigationItemSelectedListener(item -> {
+            item.setChecked(true);
+            drawer.closeDrawers();
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.nav_home:
+                    break;
+                case R.id.nav_morse_set:
+                    //startActivity(new Intent(MainActivity.this, MorseSetActivity.class));
+                    Toast.makeText(this, "모스코드 입력창", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.nav_settings:
+                    Toast.makeText(this, "세팅", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            return true;
+        });*/
     }
 
     @Override

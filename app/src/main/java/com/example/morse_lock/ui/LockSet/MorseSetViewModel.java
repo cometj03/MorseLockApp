@@ -1,4 +1,4 @@
-package com.example.morse_lock.ui.send;
+package com.example.morse_lock.ui.LockSet;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,7 +10,7 @@ public class MorseSetViewModel extends ViewModel {
 
     public MorseSetViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is send fragment");
+        mText.setValue("Morse Set Fragment");
     }
 
     public LiveData<String> getText() {

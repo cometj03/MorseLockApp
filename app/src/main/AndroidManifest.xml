@@ -19,6 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.LockSet.MorseSetActivity" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".ui.LockSet.PWSetActivity" android:parentActivityName=".ui.LockSet.MorseSetActivity"/>
     </application>
 
 </manifest>
