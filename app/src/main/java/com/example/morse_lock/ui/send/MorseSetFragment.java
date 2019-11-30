@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.morse_lock.R;
 
-public class SendFragment extends Fragment {
+public class MorseSetFragment extends Fragment {
 
-    private SendViewModel sendViewModel;
+    private MorseSetViewModel morseSetViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        sendViewModel =
-                ViewModelProviders.of(this).get(SendViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_send, container, false);
-        final TextView textView = root.findViewById(R.id.text_send);
-        sendViewModel.getText().observe(this, new Observer<String>() {
+        morseSetViewModel =
+                ViewModelProviders.of(this).get(MorseSetViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_morse_set, container, false);
+        final TextView textView = root.findViewById(R.id.text_morse_set);
+        morseSetViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
