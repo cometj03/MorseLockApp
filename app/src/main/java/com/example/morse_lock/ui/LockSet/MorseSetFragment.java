@@ -28,9 +28,14 @@ public class MorseSetFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_morse_set, container, false);
         Button changeBtn = root.findViewById(R.id.changeBtn);
         Switch switch1 = root.findViewById(R.id.switch1);
+
         Intent myIntent = new Intent(getActivity(), MorseSetActivity.class);
 
-        morseSetViewModel.getText().observe(this, s -> changeBtn.setOnClickListener(view -> startActivity(myIntent)));
+        changeBtn.setEnabled(isLocked[0]);
+        morseSetViewModel.getText().observe(this, s -> {
+            changeBtn.setOnClickListener(view -> startActivity(myIntent));
+            myIntent.putExtra("title", "change morse");
+        });
         switch1.setChecked(false);
         morseSetViewModel.getText().observe(this, s -> switch1.setOnCheckedChangeListener((compoundButton, b) -> {
             isLocked[0] = b;
@@ -38,11 +43,13 @@ public class MorseSetFragment extends Fragment {
             {
                 switch1.setTextColor(Color.parseColor("#000000"));
                 switch1.setText("Locked");
+                myIntent.putExtra("title", "set morse");
                 startActivity(myIntent);
             }else{
                 switch1.setTextColor(Color.parseColor("#9b9b9b"));
                 switch1.setText("UnLocked");
             }
+            changeBtn.setEnabled(isLocked[0]);
         }));
         return root;
     }
