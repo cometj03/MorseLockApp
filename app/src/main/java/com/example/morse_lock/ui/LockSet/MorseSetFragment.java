@@ -36,10 +36,14 @@ public class MorseSetFragment extends Fragment {
 
         changeBtn.setEnabled(isLocked[0]);
         switch1.setChecked(isLocked[0]);
-        if (isLocked[0])
+        if (isLocked[0]){
             switch1.setText("Locked");
-        else
+            switch1.setTextColor(Color.parseColor("#000000"));
+        }else {
             switch1.setText("UnLocked");
+            switch1.setTextColor(Color.parseColor("#9b9b9b"));
+        }
+
         morseSetViewModel.getText().observe(this, s ->
             changeBtn.setOnClickListener(view -> {
                 myIntent.putExtra("title", "change morse");
@@ -58,6 +62,7 @@ public class MorseSetFragment extends Fragment {
                 switch1.setText("UnLocked");
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putBoolean("isLocked", false);
+                editor.commit();
             }
             changeBtn.setEnabled(isLocked[0]);
         }));
