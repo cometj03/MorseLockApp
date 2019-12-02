@@ -36,6 +36,10 @@ public class MorseSetFragment extends Fragment {
 
         changeBtn.setEnabled(isLocked[0]);
         switch1.setChecked(isLocked[0]);
+        if (isLocked[0])
+            switch1.setText("Locked");
+        else
+            switch1.setText("UnLocked");
         morseSetViewModel.getText().observe(this, s ->
             changeBtn.setOnClickListener(view -> {
                 myIntent.putExtra("title", "change morse");

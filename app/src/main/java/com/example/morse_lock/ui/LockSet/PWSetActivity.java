@@ -22,7 +22,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PWSetActivity extends AppCompatActivity {
-    private String morsePW;
+    private String morsePW, pw;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,22 +33,23 @@ public class PWSetActivity extends AppCompatActivity {
         actionBar.setTitle("PW set");
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        TextInputLayout txtLayout_pw = findViewById(R.id.txtLayout_pw);
+        EditText et_pw_input = findViewById(R.id.et_pw_input);
+        Button btnDone = findViewById(R.id.btn_done);
+
         // 모스 코드 값 받기
         Intent getIntent = getIntent();
         morsePW = getIntent.getExtras().getString("MorseCode");
         Toast.makeText(this, "받은 코드 : " + morsePW, Toast.LENGTH_SHORT).show();
 
-        TextInputLayout txtLayout_pw = findViewById(R.id.txtLayout_pw);
-        EditText et_pw_input = findViewById(R.id.et_pw_input);
-        Button btnDone = findViewById(R.id.btn_done);
-        et_pw_input.requestFocus();
         // 키보드 보이게 하는 부분
+        et_pw_input.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-        String pw = et_pw_input.getText().toString();
         btnDone.setOnClickListener(v -> {
             SharedPreferences pref = getSharedPreferences("LOCK", 0);
+            pw = et_pw_input.getText().toString();
             if (pw.length() <= 0) {
                 txtLayout_pw.setError("PW is NULL");
             }
@@ -63,19 +64,24 @@ public class PWSetActivity extends AppCompatActivity {
                 editor.putString("morsePW", morsePW);
                 editor.putBoolean("isLocked", true);
                 editor.commit();
+                hideKeyBoard();
                 Toast.makeText(this, "설정 완료", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(PWSetActivity.this, MainActivity.class));
             }
         });
     }
 
+    private void hideKeyBoard() {
+        // 키보드 숨기기
+        InputMethodManager immhide = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        immhide.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
-                // 키보드 숨기기
-                InputMethodManager immhide = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                immhide.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                hideKeyBoard();
                 finish();
                 return true;
             }
