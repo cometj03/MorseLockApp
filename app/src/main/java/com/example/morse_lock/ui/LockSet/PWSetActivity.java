@@ -22,7 +22,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PWSetActivity extends AppCompatActivity {
-    private String morseCode;
+    private String morsePW;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,8 +35,8 @@ public class PWSetActivity extends AppCompatActivity {
 
         // 모스 코드 값 받기
         Intent getIntent = getIntent();
-        morseCode = getIntent.getExtras().getString("MorseCode");
-        Toast.makeText(this, "받은 코드 : " + morseCode, Toast.LENGTH_SHORT).show();
+        morsePW = getIntent.getExtras().getString("MorseCode");
+        Toast.makeText(this, "받은 코드 : " + morsePW, Toast.LENGTH_SHORT).show();
 
         TextInputLayout txtLayout_pw = findViewById(R.id.txtLayout_pw);
         EditText et_pw_input = findViewById(R.id.et_pw_input);
@@ -49,15 +49,19 @@ public class PWSetActivity extends AppCompatActivity {
         String pw = et_pw_input.getText().toString();
         btnDone.setOnClickListener(v -> {
             SharedPreferences pref = getSharedPreferences("LOCK", 0);
-            if (pw.length() <= 0)
+            if (pw.length() <= 0) {
                 txtLayout_pw.setError("PW is NULL");
-            else if (pw.length() < 4)
-                txtLayout_pw.setError("at least 4");
+            }
+            else if (pw.length() < 4) {
+                txtLayout_pw.setError("password is too short");
+            }
             else {
                 // pw 저장
                 txtLayout_pw.setErrorEnabled(false);
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("pw", pw);
+                editor.putString("morsePW", morsePW);
+                editor.putBoolean("isLocked", true);
                 editor.commit();
                 Toast.makeText(this, "설정 완료", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(PWSetActivity.this, MainActivity.class));

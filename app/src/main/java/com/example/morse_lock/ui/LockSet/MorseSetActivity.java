@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.morse_lock.R;
+import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -19,32 +20,37 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MorseSetActivity extends AppCompatActivity {
     private Button btn_confirm, btn_input, btn_clear;
     private EditText et_input;
+    private TextInputLayout txtLayout_morse;
     private boolean isBtnDown, addAble;
-    private double howLong = 0, first = 0;
-    String morsePW = "";
+    private double howLong, first = 0;
+    String morsePW;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_morse_set);
 
-        Intent getTitle = getIntent();
-        String title = getTitle.getExtras().getString("title");
+        String title = getIntent().getExtras().getString("title");
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(title);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         btn_confirm = findViewById(R.id.btn_confirm);
         btn_input = findViewById(R.id.btn_input);
-        et_input = findViewById(R.id.et_morse_input);
         btn_clear = findViewById(R.id.btn_clear);
+        et_input = findViewById(R.id.et_morse_input);
+        txtLayout_morse = findViewById(R.id.txtLayout_morse);
         et_input.setClickable(false);
         et_input.setFocusable(false); // EditText 비활성화
 
         Intent myIntent =  new Intent(MorseSetActivity.this, PWSetActivity.class);
         btn_confirm.setOnClickListener(v -> {
-            myIntent.putExtra("MorseCode", morsePW);
-            startActivity(myIntent);
+            if (morsePW.length() >= 4) {
+                myIntent.putExtra("MorseCode", morsePW);
+                startActivity(myIntent);
+            }else{
+                txtLayout_morse.setError("morse code is too short");
+            }
         });
         btn_input.setOnTouchListener(onButtonTouchListener);
         btn_clear.setOnClickListener(view -> {
@@ -70,16 +76,14 @@ public class MorseSetActivity extends AppCompatActivity {
                     Thread.sleep(5);
                     howLong += 0.005;
                     if (first != 0) // 처음이 아닐 때
-                    {
-                        if (howLong >= first * 1.5) // 길게 누른 상태이면
+                        if (howLong >= first * 1.1 && addAble) // 길게 누른 상태이면
                         {
                             isBtnDown = false;
-                            addAble = false;
                             morsePW += "-";
+                            addAble = false;    // 추가 불가능
+                            howLong = 0;
                             et_input.setText(morsePW);
-                            break;
                         }
-                    }
                 }catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -92,6 +96,7 @@ public class MorseSetActivity extends AppCompatActivity {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    txtLayout_morse.setErrorEnabled(false);
                     isBtnDown = true;
                     addAble = true;
                     howLong = 0;
@@ -100,13 +105,16 @@ public class MorseSetActivity extends AppCompatActivity {
 
                 case MotionEvent.ACTION_UP:
                     isBtnDown = false;
-                    if (first == 0)
+                    if (addAble)    // 추가 가능하면
                     {
-                        morsePW += "·";
-                        first = howLong;
-                    }else if (addAble){
-                        morsePW += "·";
+                        if (first == 0)
+                        {
+                            morsePW = "·";
+                            first = howLong;
+                        }else
+                            morsePW += "·";
                     }
+                    addAble = false;
                     et_input.setText(morsePW);
                     howLong = 0;
                     break;

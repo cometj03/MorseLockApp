@@ -1,6 +1,7 @@
 package com.example.morse_lock.ui.LockSet;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,7 +23,9 @@ public class MorseSetFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        SharedPreferences pref = this.getActivity().getSharedPreferences("LOCK", 0);
         boolean[] isLocked = {false};
+        isLocked[0] = pref.getBoolean("isLocked", false);
         morseSetViewModel =
                 ViewModelProviders.of(this).get(MorseSetViewModel.class);
         View root = inflater.inflate(R.layout.fragment_morse_set, container, false);
@@ -32,11 +35,12 @@ public class MorseSetFragment extends Fragment {
         Intent myIntent = new Intent(getActivity(), MorseSetActivity.class);
 
         changeBtn.setEnabled(isLocked[0]);
-        morseSetViewModel.getText().observe(this, s -> {
-            changeBtn.setOnClickListener(view -> startActivity(myIntent));
-            myIntent.putExtra("title", "change morse");
-        });
-        switch1.setChecked(false);
+        switch1.setChecked(isLocked[0]);
+        morseSetViewModel.getText().observe(this, s ->
+            changeBtn.setOnClickListener(view -> {
+                myIntent.putExtra("title", "change morse");
+                startActivity(myIntent);
+            }));
         morseSetViewModel.getText().observe(this, s -> switch1.setOnCheckedChangeListener((compoundButton, b) -> {
             isLocked[0] = b;
             if (b)
@@ -48,6 +52,8 @@ public class MorseSetFragment extends Fragment {
             }else{
                 switch1.setTextColor(Color.parseColor("#9b9b9b"));
                 switch1.setText("UnLocked");
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putBoolean("isLocked", false);
             }
             changeBtn.setEnabled(isLocked[0]);
         }));

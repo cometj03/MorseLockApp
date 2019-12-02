@@ -10,7 +10,7 @@ public class MorseSetViewModel extends ViewModel {
 
     public MorseSetViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Morse Set Fragment");
+        mText.setValue("Morse set fragment");
     }
 
     public LiveData<String> getText() {
