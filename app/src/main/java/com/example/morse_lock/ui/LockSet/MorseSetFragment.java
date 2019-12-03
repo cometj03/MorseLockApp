@@ -52,7 +52,6 @@ public class MorseSetFragment extends Fragment {
                 startActivity(myIntent);
             }));
         morseSetViewModel.getText().observe(this, s -> switch1.setOnCheckedChangeListener((compoundButton, b) -> {
-            final Boolean[] isChecked = {false};
             if (b)
             {
                 switch1.setTextColor(Color.parseColor("#000000"));
@@ -65,16 +64,15 @@ public class MorseSetFragment extends Fragment {
                 builder.setPositiveButton("확인", (dialog, which) -> {    // 확인 버튼
                     switch1.setTextColor(Color.parseColor("#9b9b9b"));
                     switch1.setText("UnLocked");
-                    isChecked[0] = true;
+                    changeBtn.setEnabled(false);
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putBoolean("isLocked", false);
                     editor.commit();
                 });
-                builder.setNegativeButton("취소", ((dialog, which) -> isChecked[0] = false));
+                builder.setNegativeButton("취소", ((dialog, which) -> isLocked[0] = true));
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
             }
-            switch1.setChecked(!isChecked[0]);
         }));
         return root;
     }

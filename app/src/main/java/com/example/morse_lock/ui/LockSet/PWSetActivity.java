@@ -66,7 +66,10 @@ public class PWSetActivity extends AppCompatActivity {
                 editor.commit();
                 hideKeyBoard();
                 Toast.makeText(this, "설정 완료", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(PWSetActivity.this, MainActivity.class));
+                Intent mainIntent = new Intent(this, MainActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);    // 이전 액티비티 삭제
+                mainIntent.putExtra("noLock", false);
+                startActivity(mainIntent);
             }
         });
     }

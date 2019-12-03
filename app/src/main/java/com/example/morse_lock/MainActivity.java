@@ -20,6 +20,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,10 +35,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Intent getIntent = getIntent();
+        Boolean isStarted = getIntent.getBooleanExtra("noLock", true);
         Intent lockIntent = new Intent(MainActivity.this, LockActivity.class);
         SharedPreferences pref = getSharedPreferences("LOCK", 0);
         isLocked = pref.getBoolean("isLocked", false);
-        if (isLocked)
+        if (isLocked && isStarted)
         {
             // 잠겼을 때
             startActivity(lockIntent);

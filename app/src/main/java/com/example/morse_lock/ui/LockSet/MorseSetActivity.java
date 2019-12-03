@@ -77,7 +77,7 @@ public class MorseSetActivity extends AppCompatActivity {
                     Thread.sleep(5);
                     howLong += 0.005;
                     if (first != 0) // 처음이 아닐 때
-                        if (howLong >= first * 1.1 && addAble) // 길게 누른 상태이면
+                        if (howLong >= first * 1.3 && addAble) // 길게 누른 상태이면
                         {
                             isBtnDown = false;
                             morsePW += "-";
@@ -130,8 +130,10 @@ public class MorseSetActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
-                startActivity(new Intent(MorseSetActivity.this, MainActivity.class));
-                finish();
+                Intent mainIntent = new Intent(this, MainActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);    // 이전 액티비티 삭제
+                mainIntent.putExtra("noLock", false);
+                startActivity(mainIntent);
                 return true;
             }
         }
