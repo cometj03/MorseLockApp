@@ -1,5 +1,7 @@
 package com.example.morse_lock.ui.LockSet;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -50,7 +52,7 @@ public class MorseSetFragment extends Fragment {
                 startActivity(myIntent);
             }));
         morseSetViewModel.getText().observe(this, s -> switch1.setOnCheckedChangeListener((compoundButton, b) -> {
-            isLocked[0] = b;
+            final Boolean[] isChecked = {false};
             if (b)
             {
                 switch1.setTextColor(Color.parseColor("#000000"));
@@ -58,13 +60,21 @@ public class MorseSetFragment extends Fragment {
                 myIntent.putExtra("title", "set morse");
                 startActivity(myIntent);
             }else{
-                switch1.setTextColor(Color.parseColor("#9b9b9b"));
-                switch1.setText("UnLocked");
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putBoolean("isLocked", false);
-                editor.commit();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Light_Dialog_Alert);   // 알림창
+                builder.setTitle("알림").setMessage("잠금을 해제하시겠습니까?");
+                builder.setPositiveButton("확인", (dialog, which) -> {    // 확인 버튼
+                    switch1.setTextColor(Color.parseColor("#9b9b9b"));
+                    switch1.setText("UnLocked");
+                    isChecked[0] = true;
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean("isLocked", false);
+                    editor.commit();
+                });
+                builder.setNegativeButton("취소", ((dialog, which) -> isChecked[0] = false));
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
-            changeBtn.setEnabled(isLocked[0]);
+            switch1.setChecked(!isChecked[0]);
         }));
         return root;
     }

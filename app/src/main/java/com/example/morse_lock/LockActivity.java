@@ -1,42 +1,38 @@
-package com.example.morse_lock.ui.LockSet;
+package com.example.morse_lock;
 
-import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.method.Touch;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
-import com.example.morse_lock.MainActivity;
-import com.example.morse_lock.R;
-import com.google.android.material.textfield.TextInputLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MorseSetActivity extends AppCompatActivity {
-    private Button btn_confirm, btn_input, btn_clear;
+import com.example.morse_lock.ui.LockSet.MorseSetActivity;
+import com.google.android.material.textfield.TextInputLayout;
+
+public class LockActivity extends AppCompatActivity {
+    private Button btn_input, btn_clear;
+    private String morsePW, morse;
     private EditText et_input;
     private TextInputLayout txtLayout_morse;
     private boolean isBtnDown, addAble;
     private double howLong, first = 0;
-    private String morsePW;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_morse_set);
+        setContentView(R.layout.activity_lock);
 
-        String title = getIntent().getExtras().getString("title");
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(title);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("App is Locked");
+        actionBar.setBackgroundDrawable(new ColorDrawable(getColor(R.color.colorAccent)));
 
-        btn_confirm = findViewById(R.id.btn_confirm);
         btn_input = findViewById(R.id.btn_input);
         btn_clear = findViewById(R.id.btn_clear);
         et_input = findViewById(R.id.et_morse_input);
@@ -44,22 +40,23 @@ public class MorseSetActivity extends AppCompatActivity {
         et_input.setClickable(false);
         et_input.setFocusable(false); // EditText 비활성화
 
-        Intent myIntent =  new Intent(MorseSetActivity.this, PWSetActivity.class);
-        btn_confirm.setOnClickListener(v -> {
-            if (morsePW.length() >= 4) {
-                myIntent.putExtra("MorseCode", morsePW);
-                startActivity(myIntent);
-            }else{
-                txtLayout_morse.setError("morse code is too short");
-            }
-        });
+        SharedPreferences pref = getSharedPreferences("LOCK", 0);
+        morse = pref.getString("morsePW", "");
+        if (morse.length() <= 0)
+            finish();
+
         btn_input.setOnTouchListener(onButtonTouchListener);
         btn_clear.setOnClickListener(view -> {
-            morsePW = "";
-            et_input.setText(morsePW);
-            first = 0;
-            howLong = 0;
+            clear();
+            //txtLayout_morse.setErrorEnabled(false);
         });
+    }
+
+    private void clear() {
+        morsePW = "";
+        et_input.setText(morsePW);
+        first = 0;
+        howLong = 0;
     }
 
     private void onBtnDown() {
@@ -118,6 +115,17 @@ public class MorseSetActivity extends AppCompatActivity {
                     addAble = false;
                     et_input.setText(morsePW);
                     howLong = 0;
+                    if (morsePW.length() >= morse.length())
+                    {
+                        if (morse.equals(morsePW))
+                        {
+                            Toast.makeText(LockActivity.this, "잠금 해제 되었습니다.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }else{
+                            txtLayout_morse.setError("Morse is wrong");
+                            clear();
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -125,16 +133,4 @@ public class MorseSetActivity extends AppCompatActivity {
             return false;
         }
     };
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
-                startActivity(new Intent(MorseSetActivity.this, MainActivity.class));
-                finish();
-                return true;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

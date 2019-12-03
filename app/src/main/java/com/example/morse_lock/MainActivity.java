@@ -1,6 +1,7 @@
 package com.example.morse_lock;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private DrawerLayout drawer;
+    private Boolean isLocked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +34,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        drawer = findViewById(R.id.drawer_layout);
+        Intent lockIntent = new Intent(MainActivity.this, LockActivity.class);
+        SharedPreferences pref = getSharedPreferences("LOCK", 0);
+        isLocked = pref.getBoolean("isLocked", false);
+        if (isLocked)
+        {
+            // 잠겼을 때
+            startActivity(lockIntent);
+        }
 
+        drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_morse_set)
                 .setDrawerLayout(drawer)
@@ -44,23 +52,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-        /*navigationView.setNavigationItemSelectedListener(item -> {
-            item.setChecked(true);
-            drawer.closeDrawers();
-            int id = item.getItemId();
-            switch (id) {
-                case R.id.nav_home:
-                    break;
-                case R.id.nav_morse_set:
-                    //startActivity(new Intent(MainActivity.this, MorseSetActivity.class));
-                    Toast.makeText(this, "모스코드 입력창", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.nav_settings:
-                    Toast.makeText(this, "세팅", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-            return true;
-        });*/
     }
 
     @Override
