@@ -128,6 +128,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
             case R.id.action_confirm:{  //toolbar의 check키 눌렀을 때 동작
                 // 저장하는 코드
+                name = et_name.getText().toString();
+                email = et_email.getText().toString();
                 SharedPreferences.Editor editor = pref.edit();
                 if (isChanged)
                     editor.putString("profile_img", BitMapToString(img));
