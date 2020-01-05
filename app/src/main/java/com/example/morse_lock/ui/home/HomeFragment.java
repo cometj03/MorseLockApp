@@ -34,20 +34,25 @@ public class HomeFragment extends Fragment {
         img_profile = root.findViewById(R.id.profile_picture);
         Button btn_show = root.findViewById(R.id.btn_show);
         TextView txt_welcome = root.findViewById(R.id.txt_welcome);
+        TextView txt_email = root.findViewById(R.id.txt_email);
 
         SharedPreferences pref = this.getActivity().getSharedPreferences("PROFILE", 0);
-        String profileString = pref.getString("profile_img", "");
+        //String profileString = pref.getString("profile_img", "");
         String name = pref.getString("username", "");
+        String email = pref.getString("email", "");
         //if (profileString.length() > 0)
         //    img_profile.setImageBitmap(StringToBitMap(profileString));
         //else
         //    img_profile.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round, getActivity().getApplicationContext().getTheme()));
 
         if (name.length() > 0)
-            homeViewModel.getText().observe(this, s -> txt_welcome.setText(name + "님 환영합니다."));
+            txt_welcome.setText(name + "님 환영합니다.");
         else
-            homeViewModel.getText().observe(this, s -> txt_welcome.setText("username 을 설정해주세요."));
-
+            txt_welcome.setText("username 을 설정해주세요.");
+        if (email.length() > 0)
+            txt_email.setText("(" + email + ")");
+        else
+            txt_email.setText("이메일을 설정해주세요.");
 
         btn_show.setOnClickListener(view -> startActivity(new Intent(getActivity(), ShowMorseActivity.class))); //.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         return root;
