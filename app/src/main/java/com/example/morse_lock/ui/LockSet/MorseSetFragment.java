@@ -21,29 +21,33 @@ import com.example.morse_lock.R;
 
 public class MorseSetFragment extends Fragment {
 
+    private boolean isLocked;
+    private int sensitivity;
+
     private MorseSetViewModel morseSetViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        SharedPreferences pref = this.getActivity().getSharedPreferences("LOCK", 0);
-        SharedPreferences.Editor editor = pref.edit();
-        boolean[] isLocked = {false};
-        isLocked[0] = pref.getBoolean("isLocked", false);
-        int[] sensitivity = {pref.getInt("sensitivity", 0)};
-        if (sensitivity[0] == 0)
-            sensitivity[0] = 50;
-
         morseSetViewModel = ViewModelProviders.of(this).get(MorseSetViewModel.class);
         View root = inflater.inflate(R.layout.fragment_morse_set, container, false);
+
+        SharedPreferences pref = this.getActivity().getSharedPreferences("LOCK", 0);
+        SharedPreferences.Editor editor = pref.edit();
+        isLocked = false;
+        isLocked = pref.getBoolean("isLocked", false);
+        sensitivity = pref.getInt("sensitivity", 0);
 
         Button changeBtn = root.findViewById(R.id.changeBtn);
         Switch switch1 = root.findViewById(R.id.switch1);
         SeekBar bar_sensitivity = root.findViewById(R.id.bar_sensitivity);
         TextView txt_sensitivity = root.findViewById(R.id.txt_sensitivity);
 
-        bar_sensitivity.setProgress(sensitivity[0]);
-        txt_sensitivity.setText((double)sensitivity[0] / 200.0 + "s");
+        bar_sensitivity.setProgress(sensitivity);
+        if (sensitivity == 0)
+            txt_sensitivity.setText("Disabled");
+        else
+            txt_sensitivity.setText((double)sensitivity / 1000.0 + "s");
 
         Intent myIntent = new Intent(getActivity(), MorseSetActivity.class);
 
@@ -51,8 +55,8 @@ public class MorseSetFragment extends Fragment {
         bar_sensitivity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                sensitivity[0] = i;
-                txt_sensitivity.setText((double)i / 200.0 + "s");
+                sensitivity = i;
+                txt_sensitivity.setText((double)i / 1000.0 + "s");
             }
 
             @Override
@@ -62,16 +66,22 @@ public class MorseSetFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                editor.putBoolean("isSensitivity", true);
-                editor.putInt("sensitivity", sensitivity[0]);
+                if (sensitivity == 0) {
+                    editor.putBoolean("isSensitivity", false);
+                    txt_sensitivity.setText("Disabled");
+                    Toast.makeText(getActivity(), "감도 비활성화 됨", Toast.LENGTH_SHORT).show();
+                }else
+                    editor.putBoolean("isSensitivity", true);
+
+                editor.putInt("sensitivity", sensitivity);
                 editor.commit();
             }
         });
 
         // 버튼 비활성화 or 활성화
-        changeBtn.setEnabled(isLocked[0]);
-        switch1.setChecked(isLocked[0]);
-        if (isLocked[0]){
+        changeBtn.setEnabled(isLocked);
+        switch1.setChecked(isLocked);
+        if (isLocked){
             switch1.setText("Locked");
             switch1.setTextColor(Color.parseColor("#000000"));
         }else {

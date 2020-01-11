@@ -1,6 +1,7 @@
 package com.example.morse_lock.ui.LockSet;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.method.Touch;
@@ -9,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.morse_lock.MainActivity;
 import com.example.morse_lock.R;
@@ -22,9 +24,10 @@ public class MorseSetActivity extends AppCompatActivity {
     private Button btn_confirm, btn_input, btn_clear;
     private EditText et_input;
     private TextInputLayout txtLayout_morse;
-    private boolean isBtnDown, addAble;
-    private double howLong, first = 0;
+    private boolean isBtnDown, addAble, isSensitivity;
+    private double howLong, first = 0, bench;
     private String morsePW;
+    private TextView txt_sense_info;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,8 +44,22 @@ public class MorseSetActivity extends AppCompatActivity {
         btn_clear = findViewById(R.id.btn_clear);
         et_input = findViewById(R.id.et_morse_input);
         txtLayout_morse = findViewById(R.id.txtLayout_morse);
+        txt_sense_info = findViewById(R.id.txt_sense_info);
         et_input.setClickable(false);
         et_input.setFocusable(false); // EditText 비활성화
+
+        SharedPreferences pref = this.getSharedPreferences("LOCK", 0);
+        isSensitivity = pref.getBoolean("isSensitivity", false);
+        if (isSensitivity) {
+            bench = (double)pref.getInt("sensitivity", 0) / 1000.0;
+            txt_sense_info.setText("현재 감도 : " + bench + "s");
+        }
+        else
+            txt_sense_info.setText("* 맨 처음 입력은 '·'으로 입력 됩니다.");
+
+        // 초기화
+        morsePW = "";
+        et_input.setText(morsePW);
 
         Intent myIntent =  new Intent(MorseSetActivity.this, PWSetActivity.class);
         btn_confirm.setOnClickListener(v -> {
@@ -76,15 +93,27 @@ public class MorseSetActivity extends AppCompatActivity {
                 try {
                     Thread.sleep(5);
                     howLong += 0.005;
-                    if (first != 0) // 처음이 아닐 때
-                        if (howLong >= first * 1.3 && addAble) // 길게 누른 상태이면
-                        {
-                            isBtnDown = false;
-                            morsePW += "-";
-                            addAble = false;    // 추가 불가능
-                            howLong = 0;
-                            et_input.setText(morsePW);
-                        }
+                    boolean chk = false;
+                    if (isSensitivity) {
+                        if (howLong >= bench && addAble)
+                            chk = true;
+                    }else {
+                        if (first != 0 && howLong >= first * 1.3 && addAble) // 처음이 아닐 때 길게 누른 상태이면
+                            chk = true;
+                    }
+
+                    // "-" 추가
+                    if (chk) {
+                        isBtnDown = false;
+                        addAble = false;    // 추가 불가능
+
+                        if (isSensitivity && first == 0) {
+                            morsePW = "-";
+                            first = howLong;
+                        }else morsePW += "-";
+
+                        et_input.setText(morsePW);
+                    }
                 }catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -104,19 +133,28 @@ public class MorseSetActivity extends AppCompatActivity {
                     onBtnDown();
                     break;
 
-                case MotionEvent.ACTION_UP:
-                    isBtnDown = false;
+                case MotionEvent.ACTION_UP: // "-" 나오기 전에 버튼 떼면
+
                     if (addAble)    // 추가 가능하면
                     {
-                        if (first == 0)
-                        {
-                            morsePW = "·";
-                            first = howLong;
-                        }else
-                            morsePW += "·";
+                        /*if (isSensitivity) {    // 감도 설정 되어 있을 때
+                            if (first == 0) {
+                                morsePW = "·";
+                                first = 1;
+                            }else {
+                                morsePW += "·";
+                            }
+                        }else {                 // 감도 설정 안 되어 있을 때*/
+                            if (first == 0) {
+                                morsePW = "·";
+                                first = howLong;
+                            } else
+                                morsePW += "·";
+
+                        et_input.setText(morsePW);
                     }
+                    isBtnDown = false;
                     addAble = false;
-                    et_input.setText(morsePW);
                     howLong = 0;
                     break;
                 default:
